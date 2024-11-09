@@ -10,3 +10,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+
+  editor.BlockManager.add('clickable-box', {
+    label: 'Clickable Box',
+    content: `<div class="box" onclick="location.href='subpage.html'">Click Me</div>`,
+    category: 'Basic',
+    attributes: { class: 'fa fa-square' }
+  });
+});
