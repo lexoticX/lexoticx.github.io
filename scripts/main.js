@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
     fromElement: true,             // Use HTML elements in the editor container
     width: 'auto',                 // Full width of the screen
     height: '100vh',               // Full viewport height
-    storageManager: { type: null },// Disable storage manager to avoid issues
+    storageManager: { type: null }, // Disable storage manager to avoid issues
 
     blockManager: {                // Add custom blocks
-      appendTo: '#blocks',
+      appendTo: '#blocks'          // Ensure this line doesn't have a trailing comma or extra braces
     }
   });
 
