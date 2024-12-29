@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const fromVersionSelect = document.getElementById('fromVersion');
     const toVersionSelect = document.getElementById('toVersion');
-    const fileStatus = document.getElementById('fileStatus');
+    const loadingSpinner = document.getElementById('loadingSpinner');
     
     fetch('https://api.github.com/repos/lexoticX/lexoticx.github.io/contents/versions')
         .then(response => response.json())
@@ -24,10 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching versions:', error));
 
-    document.getElementById('zipFile').addEventListener('change', function() {
-        fileStatus.textContent = this.files[0] ? this.files[0].name : 'No file uploaded';
-    });
-
     document.getElementById('update').addEventListener('click', function() {
         const zipFile = document.getElementById('zipFile').files[0];
         const includeCredits = document.getElementById('includeCredits').checked;
@@ -38,45 +34,44 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Please select a zip file.');
             return;
         }
-        processZip(zipFile, fromVersion, toVersion, includeCredits);
+
+        loadingSpinner.style.display = 'block';
+
+        processZip(zipFile, fromVersion, toVersion, includeCredits).then(() => {
+            loadingSpinner.style.display = 'none';
+        });
     });
 });
 
-function processZip(zipFile, fromVersion, toVersion, includeCredits) {
+async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
     const jszip = new JSZip();
-    jszip.loadAsync(zipFile).then(function(zip) {
-        let currentVersion = parseInt(fromVersion);
-        const endVersion = parseInt(toVersion);
+    const zip = await jszip.loadAsync(zipFile);
+    let currentVersion = parseInt(fromVersion);
+    const endVersion = parseInt(toVersion);
 
-        function updateVersion(zip) {
-            if (currentVersion >= endVersion) {
-                zip.generateAsync({ type: "blob" }).then(function(blob) {
-                    saveAs(blob, "modified_datapack.zip");
-                });
-                return;
-            }
+    while (currentVersion < endVersion) {
+        const nextVersion = currentVersion + 1;
+        await updateVersion(zip, currentVersion, nextVersion, includeCredits);
+        currentVersion = nextVersion;
+    }
 
-            const nextVersion = currentVersion + 1;
-            zip.forEach(function (relativePath, zipEntry) {
-                if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction')) {
-                    zipEntry.async("string").then(function(content) {
-                        const modifiedContent = modifyText(content, currentVersion, nextVersion);
-                        zip.file(zipEntry.name, modifiedContent);
-                    });
-                } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
-                    zipEntry.async("string").then(function(content) {
-                        const newContent = content + `\nThis was updated with the datapack updater from version ${fromVersion} to ${toVersion}. Visit: lexoticX.github.io`;
-                        zip.file(zipEntry.name, newContent);
-                    });
-                }
-            });
+    const blob = await zip.generateAsync({ type: "blob" });
+    saveAs(blob, zipFile.name);
+}
 
-            currentVersion = nextVersion;
-            updateVersion(zip);
+async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
+    await Promise.all(Object.keys(zip.files).map(async (relativePath) => {
+        const zipEntry = zip.files[relativePath];
+        if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction') || zipEntry.name.endsWith('.mcmeta')) {
+            const content = await zipEntry.async("string");
+            const modifiedContent = modifyText(content, fromVersion, toVersion);
+            zip.file(zipEntry.name, modifiedContent);
+        } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
+            const content = await zipEntry.async("string");
+            const newContent = `Credits for lexoticX\n${content}`;
+            zip.file(zipEntry.name, newContent);
         }
-
-        updateVersion(zip);
-    });
+    }));
 }
 
 function modifyText(content, fromVersion, toVersion) {
