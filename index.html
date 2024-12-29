@@ -13,6 +13,8 @@
             height: 100vh;
             background-color: #121212;
             color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
             margin: 0;
         }
         h1 {
@@ -20,21 +22,33 @@
         }
         select, button, input[type="file"], label {
             margin: 10px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #555;
         }
         #update {
             margin-top: 20px;
-            padding: 15px 30px;
-            font-size: 18px;
+        }
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
     </style>
 </head>
 <body>
     <h1>Datapack Updater</h1>
-    <input type="file" id="zipFile" />
+    <div class="file-upload">
+        <input type="file" id="zipFile" />
+        <span id="fileStatus">No file uploaded</span>
+    </div>
     <div>
         <select id="fromVersion"></select>
         <span> > </span>
