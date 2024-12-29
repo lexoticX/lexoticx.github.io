@@ -68,7 +68,7 @@ async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
 }
 
 async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
-    const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && !name.startsWith('data/'));
+    const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && name.startsWith('data/'));
     const targetFolder = folders.length > 0 ? folders[0] : '';
 
     await Promise.all(Object.keys(zip.files).map(async (relativePath) => {
@@ -85,20 +85,18 @@ async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
     }));
 
     if (includeCredits && !zip.files[`${targetFolder}credits.txt`]) {
-        zip.file(`${targetFolder}credits.txt`, 'Credits for lexoticX\n');
+        zip.file(`${targetFolder ? targetFolder : ''}credits.txt`, 'Credits for lexoticX\n');
     }
 }
 
 function modifyText(content, fromVersion, toVersion) {
     const lines = content.split('\n');
     if (lines.length > 2) {
-        const thirdLineFrom = lines[2];
-        const thirdLineTo = toVersion.split('\n')[2];
-        const line5From = fromVersion.split('\n')[5];
-        const line5To = toVersion.split('\n')[5];
-
-        lines[2] = thirdLineTo;
-        lines = lines.map(line => line.replace(line5From, line5To));
+        lines[2] = toVersion.split('\n')[2];
+        lines = lines.map(line => {
+            const regex = new RegExp(`\\b${fromVersion}\\b`, 'g');
+            return line.replace(regex, toVersion);
+        });
     }
     return lines.join('\n');
 }
