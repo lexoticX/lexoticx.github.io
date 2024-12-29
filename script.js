@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fromVersionSelect = document.getElementById('fromVersion');
     const toVersionSelect = document.getElementById('toVersion');
     const loadingSpinner = document.getElementById('loadingSpinner');
+    const fileNameDisplay = document.getElementById('fileName');
 
     fetch('https://api.github.com/repos/lexoticX/lexoticx.github.io/contents/versions')
         .then(response => response.json())
@@ -20,6 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         })
         .catch(error => console.error('Error fetching versions:', error));
+
+    document.getElementById('zipFile').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            fileNameDisplay.textContent = file.name;
+        } else {
+            fileNameDisplay.textContent = '';
+        }
+    });
 
     document.getElementById('update').addEventListener('click', function() {
         const zipFile = document.getElementById('zipFile').files[0];
@@ -68,7 +78,7 @@ async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
 }
 
 async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
-    const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && name.startsWith('data/'));
+    const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && !name.startsWith('data/'));
     const targetFolder = folders.length > 0 ? folders[0] : '';
 
     await Promise.all(Object.keys(zip.files).map(async (relativePath) => {
@@ -85,7 +95,7 @@ async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
     }));
 
     if (includeCredits && !zip.files[`${targetFolder}credits.txt`]) {
-        zip.file(`${targetFolder ? targetFolder : ''}credits.txt`, 'Credits for lexoticX\n');
+        zip.file(`${targetFolder}credits.txt`, 'Credits for lexoticX\n');
     }
 }
 
