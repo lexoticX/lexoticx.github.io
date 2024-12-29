@@ -1,104 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datapack Updater</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #121212;
-            color: #ffffff;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
+document.addEventListener('DOMContentLoaded', function() {
+    const fromVersionSelect = document.getElementById('fromVersion');
+    const toVersionSelect = document.getElementById('toVersion');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    fetch('https://api.github.com/repos/lexoticX/lexoticx.github.io/contents/versions')
+        .then(response => response.json())
+        .then(files => {
+            const versions = files
+                .filter(file => file.name.endsWith('.txt'))
+                .map(file => file.name.replace('.txt', ''));
+
+            versions.forEach(version => {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = version;
+                optionFrom.textContent = version;
+                fromVersionSelect.appendChild(optionFrom);
+
+                const optionTo = document.createElement('option');
+                optionTo.value = version;
+                optionTo.textContent = version;
+                toVersionSelect.appendChild(optionTo);
+            });
+        })
+        .catch(error => console.error('Error fetching versions:', error));
+
+    document.getElementById('update').addEventListener('click', function() {
+        const zipFile = document.getElementById('zipFile').files[0];
+        const includeCredits = document.getElementById('includeCredits').checked;
+        const fromVersion = fromVersionSelect.value;
+        const toVersion = toVersionSelect.value;
+
+        if (!zipFile) {
+            alert('Please select a zip file.');
+            return;
         }
-        h1 {
-            margin-bottom: 20px;
+
+        loadingSpinner.style.display = 'block';
+
+        processZip(zipFile, fromVersion, toVersion, includeCredits).then(() => {
+            loadingSpinner.style.display = 'none';
+        });
+    });
+});
+
+async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
+    const jszip = new JSZip();
+    const zip = await jszip.loadAsync(zipFile);
+    let currentVersion = parseInt(fromVersion);
+    const endVersion = parseInt(toVersion);
+
+    while (currentVersion < endVersion) {
+        const nextVersion = currentVersion + 1;
+        await updateVersion(zip, currentVersion, nextVersion, includeCredits);
+        currentVersion = nextVersion;
+    }
+
+    const blob = await zip.generateAsync({ type: "blob" });
+    saveAs(blob, zipFile.name);
+}
+
+async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
+    const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && !name.startsWith('data/'));
+    const targetFolder = folders.length > 0 ? folders[0] : '';
+
+    await Promise.all(Object.keys(zip.files).map(async (relativePath) => {
+        const zipEntry = zip.files[relativePath];
+        if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction') || zipEntry.name.endsWith('.mcmeta')) {
+            const content = await zipEntry.async("string");
+            const modifiedContent = modifyText(content, fromVersion, toVersion);
+            zip.file(zipEntry.name, modifiedContent);
+        } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
+            const content = await zipEntry.async("string");
+            const newContent = `Credits for lexoticX\n${content}`;
+            zip.file(zipEntry.name, newContent);
         }
-        select, button, label {
-            margin: 10px;
-            font-size: 16px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 50px;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #555;
-            border-radius: 50px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #777;
-        }
-        #update {
-            margin-top: 20px;
-        }
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .file-upload input[type="file"] {
-            display: none;
-        }
-        .file-upload label {
-            cursor: pointer;
-            padding: 15px 30px;
-            border-radius: 50px;
-            background-color: #444;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .file-upload label:hover {
-            background-color: #666;
-        }
-        .loading-spinner {
-            display: none;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #fff;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .credits-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    </style>
-</head>
-<body>
-    <h1>Datapack Updater</h1>
-    <div class="file-upload">
-        <input type="file" id="zipFile" />
-        <label for="zipFile">Upload File</label>
-    </div>
-    <div>
-        <select id="fromVersion"></select>
-        <span style="font-size: 24px; margin: 0 10px;">&#8594;</span>
-        <select id="toVersion"></select>
-    </div>
-    <div class="credits-container">
-        <label for="includeCredits">Include Credits</label>
-        <input type="checkbox" id="includeCredits" checked>
-    </div>
-    <button id="update">Update</button>
-    <div class="loading-spinner" id="loadingSpinner"></div>
-    <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-</body>
-</html>
+    }));
+
+    if (includeCredits && !zip.files[`${targetFolder}credits.txt`]) {
+        zip.file(`${targetFolder}credits.txt`, 'Credits for lexoticX\n');
+    }
+}
+
+function modifyText(content, fromVersion, toVersion) {
+    const lines = content.split('\n');
+    if (lines.length > 2) {
+        const thirdLineFrom = lines[2];
+        const thirdLineTo = toVersion.split('\n')[2];
+        const line5From = fromVersion.split('\n')[5];
+        const line5To = toVersion.split('\n')[5];
+
+        lines[2] = thirdLineTo;
+        lines = lines.map(line => line.replace(line5From, line5To));
+    }
+    return lines.join('\n');
+}
