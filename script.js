@@ -6,10 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('https://api.github.com/repos/lexoticX/lexoticx.github.io/contents/versions')
         .then(response => response.json())
         .then(files => {
-            const versions = files
-                .filter(file => file.name.endsWith('.txt'))
-                .map(file => file.name.replace('.txt', ''));
-
+            const versions = files.filter(file => file.name.endsWith('.txt')).map(file => file.name.replace('.txt', ''));
             versions.forEach(version => {
                 const optionFrom = document.createElement('option');
                 optionFrom.value = version;
