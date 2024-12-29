@@ -4,15 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datapack Updater</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        select, button, input[type="file"] {
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
     <h1>Datapack Updater</h1>
     <input type="file" id="zipFile" />
-    <button id="includeCredits">Include Credits</button>
-    <select id="versionSelect">
-        <!-- Options will be dynamically added here -->
-    </select>
-    <button id="processZip">Process Zip</button>
+    <div>
+        <select id="fromVersion"></select>
+        <span> > </span>
+        <select id="toVersion"></select>
+    </div>
+    <div>
+        <label for="includeCredits">Include Credits</label>
+        <input type="checkbox" id="includeCredits">
+    </div>
+    <button id="update">Update</button>
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
