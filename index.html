@@ -19,7 +19,7 @@
         h1 {
             margin-bottom: 20px;
         }
-        select, button, input[type="file"], label {
+        select, button, label {
             margin: 10px;
             font-size: 16px;
             background-color: #333;
@@ -47,6 +47,19 @@
             flex-direction: column;
             align-items: center;
         }
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        .file-upload label {
+            cursor: pointer;
+            padding: 15px 30px;
+            border-radius: 50px;
+            background-color: #444;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .file-upload label:hover {
+            background-color: #666;
+        }
         .loading-spinner {
             display: none;
             border: 4px solid rgba(255, 255, 255, 0.3);
@@ -71,15 +84,16 @@
     <h1>Datapack Updater</h1>
     <div class="file-upload">
         <input type="file" id="zipFile" />
+        <label for="zipFile">Upload File</label>
     </div>
     <div>
         <select id="fromVersion"></select>
-        <span> > </span>
+        <span style="font-size: 24px; margin: 0 10px;">&#8594;</span>
         <select id="toVersion"></select>
     </div>
     <div class="credits-container">
         <label for="includeCredits">Include Credits</label>
-        <input type="checkbox" id="includeCredits">
+        <input type="checkbox" id="includeCredits" checked>
     </div>
     <button id="update">Update</button>
     <div class="loading-spinner" id="loadingSpinner"></div>
