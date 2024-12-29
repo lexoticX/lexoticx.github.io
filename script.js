@@ -1,17 +1,31 @@
 document.addEventListener('DOMContentLoaded', function() {
     const fromVersionSelect = document.getElementById('fromVersion');
     const toVersionSelect = document.getElementById('toVersion');
-    const versions = ['version1.txt', 'version2.txt']; // Replace with actual version names from your versions folder
-    versions.forEach(version => {
-        const optionFrom = document.createElement('option');
-        optionFrom.value = version;
-        optionFrom.textContent = version;
-        fromVersionSelect.appendChild(optionFrom);
+    const fileStatus = document.getElementById('fileStatus');
+    
+    fetch('https://api.github.com/repos/lexoticX/lexoticx.github.io/contents/versions')
+        .then(response => response.json())
+        .then(files => {
+            const versions = files
+                .filter(file => file.name.endsWith('.txt'))
+                .map(file => file.name.replace('.txt', ''));
+            
+            versions.forEach(version => {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = version;
+                optionFrom.textContent = version;
+                fromVersionSelect.appendChild(optionFrom);
 
-        const optionTo = document.createElement('option');
-        optionTo.value = version;
-        optionTo.textContent = version;
-        toVersionSelect.appendChild(optionTo);
+                const optionTo = document.createElement('option');
+                optionTo.value = version;
+                optionTo.textContent = version;
+                toVersionSelect.appendChild(optionTo);
+            });
+        })
+        .catch(error => console.error('Error fetching versions:', error));
+
+    document.getElementById('zipFile').addEventListener('change', function() {
+        fileStatus.textContent = this.files[0] ? this.files[0].name : 'No file uploaded';
     });
 
     document.getElementById('update').addEventListener('click', function() {
@@ -31,28 +45,44 @@ document.addEventListener('DOMContentLoaded', function() {
 function processZip(zipFile, fromVersion, toVersion, includeCredits) {
     const jszip = new JSZip();
     jszip.loadAsync(zipFile).then(function(zip) {
-        zip.forEach(function (relativePath, zipEntry) {
-            if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction')) {
-                zipEntry.async("string").then(function(content) {
-                    const modifiedContent = modifyText(content, fromVersion, toVersion);
-                    zip.file(zipEntry.name, modifiedContent);
-                });
-            } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
-                zipEntry.async("string").then(function(content) {
-                    const newContent = content + "\nThis was updated with the datapack updater. Visit: lexoticX.github.io";
-                    zip.file(zipEntry.name, newContent);
-                });
-            }
-        });
+        let currentVersion = parseInt(fromVersion);
+        const endVersion = parseInt(toVersion);
 
-        zip.generateAsync({ type: "blob" }).then(function(blob) {
-            saveAs(blob, "modified_datapack.zip");
-        });
+        function updateVersion(zip) {
+            if (currentVersion >= endVersion) {
+                zip.generateAsync({ type: "blob" }).then(function(blob) {
+                    saveAs(blob, "modified_datapack.zip");
+                });
+                return;
+            }
+
+            const nextVersion = currentVersion + 1;
+            zip.forEach(function (relativePath, zipEntry) {
+                if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction')) {
+                    zipEntry.async("string").then(function(content) {
+                        const modifiedContent = modifyText(content, currentVersion, nextVersion);
+                        zip.file(zipEntry.name, modifiedContent);
+                    });
+                } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
+                    zipEntry.async("string").then(function(content) {
+                        const newContent = content + `\nThis was updated with the datapack updater from version ${fromVersion} to ${toVersion}. Visit: lexoticX.github.io`;
+                        zip.file(zipEntry.name, newContent);
+                    });
+                }
+            });
+
+            currentVersion = nextVersion;
+            updateVersion(zip);
+        }
+
+        updateVersion(zip);
     });
 }
 
 function modifyText(content, fromVersion, toVersion) {
-    // Implement your logic to modify content based on the from and to versions
-    // Example: Replace all occurrences of a variable with the new version's value
-    return content.replace(/(\(say_text\))/g, toVersion);
+    const lines = content.split('\n');
+    if (lines.length > 2) {
+        lines[2] = lines[2].replace(new RegExp(`\\b${fromVersion}\\b`, 'g'), toVersion);
+    }
+    return lines.join('\n');
 }
