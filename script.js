@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('update').addEventListener('click', function() {
         const zipFile = document.getElementById('zipFile').files[0];
-        const includeCredits = document.getElementById('includeCredits').checked;
+        const includecreditss = document.getElementById('includecreditss').checked;
         const fromVersion = fromVersionSelect.value;
         const toVersion = toVersionSelect.value;
 
@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         loadingSpinner.style.display = 'block';
 
-        processZip(zipFile, fromVersion, toVersion, includeCredits).then(() => {
+        processZip(zipFile, fromVersion, toVersion, includecreditss).then(() => {
             loadingSpinner.style.display = 'none';
         });
     });
 });
 
-async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
+async function processZip(zipFile, fromVersion, toVersion, includecreditss) {
     const jszip = new JSZip();
     const zip = await jszip.loadAsync(zipFile);
 
@@ -69,7 +69,7 @@ async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
 
     while (currentVersion < endVersion) {
         const nextVersion = currentVersion + 1;
-        await updateVersion(zip, currentVersion, nextVersion, includeCredits);
+        await updateVersion(zip, currentVersion, nextVersion, includecreditss);
         currentVersion = nextVersion;
     }
 
@@ -77,7 +77,7 @@ async function processZip(zipFile, fromVersion, toVersion, includeCredits) {
     saveAs(blob, zipFile.name);
 }
 
-async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
+async function updateVersion(zip, fromVersion, toVersion, includecreditss) {
     const folders = Object.keys(zip.files).filter(name => zip.files[name].dir && !name.startsWith('data/'));
     const targetFolder = folders.length > 0 ? folders[0] : '';
 
@@ -87,15 +87,15 @@ async function updateVersion(zip, fromVersion, toVersion, includeCredits) {
             const content = await zipEntry.async("string");
             const modifiedContent = modifyText(content, fromVersion, toVersion);
             zip.file(zipEntry.name, modifiedContent);
-        } else if (includeCredits && zipEntry.name.endsWith('credits.txt')) {
+        } else if (includecreditss && zipEntry.name.endsWith('creditss.txt')) {
             const content = await zipEntry.async("string");
-            const newContent = `Credits for lexoticX\n${content}`;
+            const newContent = `creditss for lexoticX\n${content}`;
             zip.file(zipEntry.name, newContent);
         }
     }));
 
-    if (includeCredits && !zip.files[`${targetFolder}credits.txt`]) {
-        zip.file(`${targetFolder}credits.txt`, 'Credits for lexoticX\n');
+    if (includecreditss && !zip.files[`${targetFolder}creditss.txt`]) {
+        zip.file(`${targetFolder}creditss.txt`, 'creditss for lexoticX\n');
     }
 }
 
