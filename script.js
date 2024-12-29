@@ -34,8 +34,14 @@ function processZip(zipFile, selectedVersion) {
                     const modifiedContent = modifyText(content, selectedVersion);
                     zip.file(zipEntry.name, modifiedContent);
                 });
+            } else if (zipEntry.name.endsWith('credits.txt')) {
+                zipEntry.async("string").then(function(content) {
+                    const newContent = content + "\nThis was updated with the datapack updater. Visit: lexoticX.github.io";
+                    zip.file(zipEntry.name, newContent);
+                });
             }
         });
+
         zip.generateAsync({ type: "blob" }).then(function(blob) {
             saveAs(blob, "modified_datapack.zip");
         });
