@@ -32,9 +32,12 @@ function processZip(zipFile, selectedVersion) {
             if (zipEntry.name.endsWith('.json') || zipEntry.name.endsWith('.mcfunction')) {
                 zipEntry.async("string").then(function(content) {
                     const modifiedContent = modifyText(content, selectedVersion);
-                    // Save the modified content back to the zip
+                    zip.file(zipEntry.name, modifiedContent);
                 });
             }
+        });
+        zip.generateAsync({ type: "blob" }).then(function(blob) {
+            saveAs(blob, "modified_datapack.zip");
         });
     });
 }
