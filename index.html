@@ -14,7 +14,6 @@
             background-color: #121212;
             color: #ffffff;
             font-family: 'Arial', sans-serif;
-            font-weight: bold;
             margin: 0;
         }
         h1 {
@@ -27,16 +26,41 @@
             color: #fff;
             border: none;
             padding: 10px;
+            border-radius: 50px;
         }
         button {
             padding: 15px 30px;
             font-size: 18px;
             background-color: #555;
+            border-radius: 50px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #777;
         }
         #update {
             margin-top: 20px;
         }
         .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .credits-container {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -47,18 +71,18 @@
     <h1>Datapack Updater</h1>
     <div class="file-upload">
         <input type="file" id="zipFile" />
-        <span id="fileStatus">No file uploaded</span>
     </div>
     <div>
         <select id="fromVersion"></select>
         <span> > </span>
         <select id="toVersion"></select>
     </div>
-    <div>
+    <div class="credits-container">
         <label for="includeCredits">Include Credits</label>
         <input type="checkbox" id="includeCredits">
     </div>
     <button id="update">Update</button>
+    <div class="loading-spinner" id="loadingSpinner"></div>
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
