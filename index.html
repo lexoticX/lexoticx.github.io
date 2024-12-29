@@ -78,11 +78,16 @@
             flex-direction: column;
             align-items: center;
         }
+        #fileName {
+            margin-top: 10px;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
     <h1>Datapack Updater</h1>
     <div class="file-upload">
+        <div id="fileName"></div>
         <input type="file" id="zipFile" accept=".zip" />
         <label for="zipFile">Upload File</label>
     </div>
