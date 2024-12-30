@@ -103,7 +103,7 @@
             position: relative;
             width: var(--width);
             height: var(--height);
-            background: #007bff;
+            background: #555;
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: background 0.3s;
@@ -119,11 +119,8 @@
             border-radius: 50%;
             transition: transform 0.3s;
         }
-        .toggle.inactive {
-            background: #555;
-        }
-        .toggle.inactive::before {
-            transform: translateX(0);
+        .toggle.active {
+            background: #007bff;
         }
         .toggle.active::before {
             transform: translateX(var(--width) - var(--height));
@@ -161,11 +158,8 @@
             const includeCreditInput = document.getElementById('includecreditinput');
             includeCreditToggle.classList.add('active');
             includeCreditToggle.addEventListener('click', function() {
-                this.classList.toggle('active');
-                this.classList.toggle('inactive');
-                includeCreditInput.checked = !includeCreditInput.checked;
-                // Update the background color based on state
-                this.style.backgroundColor = includeCreditInput.checked ? '#007bff' : '#555';
+                includeCreditToggle.classList.toggle('active');
+                includeCreditInput.checked = includeCreditToggle.classList.contains('active');
             });
         });
     </script>
