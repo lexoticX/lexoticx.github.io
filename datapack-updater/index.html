@@ -35,9 +35,9 @@
             top: 10px;
             left: 10px;
             font-size: 14px;
-            background-color: transparent;
+            background-color: #333; /* Same color as version selection button */
             border: none;
-            color: #aaa; /* More gray color */
+            color: #fff; /* White text */
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -118,13 +118,12 @@
             background: #fff;
             border-radius: 50%;
             transition: transform 0.3s;
-            transform: translateX(var(--width) - var(--height));
-        }
-        .toggle.inactive {
-            background: #555;
         }
         .toggle.inactive::before {
             transform: translateX(0);
+        }
+        .toggle.active::before {
+            transform: translateX(var(--width) - var(--height));
         }
     </style>
 </head>
@@ -145,7 +144,7 @@
     </div>
     <div class="credit-container">
         <label for="includecredit">Include Credit</label>
-        <div id="includecredit" class="toggle"></div>
+        <div id="includecredit" class="toggle active"></div>
     </div>
     <button id="update">Update</button>
     <div class="loading-spinner" id="loadingSpinner"></div>
@@ -155,8 +154,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const includeCreditToggle = document.getElementById('includecredit');
+            includeCreditToggle.classList.add('active');
             includeCreditToggle.addEventListener('click', function() {
                 this.classList.toggle('inactive');
+                this.classList.toggle('active');
             });
         });
     </script>
