@@ -119,6 +119,9 @@
             border-radius: 50%;
             transition: transform 0.3s;
         }
+        .toggle.inactive {
+            background: #555;
+        }
         .toggle.inactive::before {
             transform: translateX(0);
         }
@@ -144,7 +147,8 @@
     </div>
     <div class="credit-container">
         <label for="includecredit">Include Credit</label>
-        <div id="includecredit" class="toggle active"></div>
+        <div id="includecredit" class="toggle"></div>
+        <input type="checkbox" id="includecreditinput" style="display: none;" checked>
     </div>
     <button id="update">Update</button>
     <div class="loading-spinner" id="loadingSpinner"></div>
@@ -154,10 +158,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const includeCreditToggle = document.getElementById('includecredit');
+            const includeCreditInput = document.getElementById('includecreditinput');
             includeCreditToggle.classList.add('active');
             includeCreditToggle.addEventListener('click', function() {
-                this.classList.toggle('inactive');
                 this.classList.toggle('active');
+                this.classList.toggle('inactive');
+                includeCreditInput.checked = !includeCreditInput.checked;
+                // Update the background color based on state
+                this.style.backgroundColor = includeCreditInput.checked ? '#007bff' : '#555';
             });
         });
     </script>
