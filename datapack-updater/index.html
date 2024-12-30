@@ -37,7 +37,7 @@
             font-size: 14px;
             background-color: transparent;
             border: none;
-            color: #888; /* Adjusted to a more gray color */
+            color: #aaa; /* More gray color */
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -103,7 +103,7 @@
             position: relative;
             width: var(--width);
             height: var(--height);
-            background: #555;
+            background: #007bff;
             border-radius: var(--border-radius);
             cursor: pointer;
             transition: background 0.3s;
@@ -118,12 +118,13 @@
             background: #fff;
             border-radius: 50%;
             transition: transform 0.3s;
-        }
-        .toggle.active {
-            background: #007bff;
-        }
-        .toggle.active::before {
             transform: translateX(var(--width) - var(--height));
+        }
+        .toggle.inactive {
+            background: #555;
+        }
+        .toggle.inactive::before {
+            transform: translateX(0);
         }
     </style>
 </head>
@@ -152,8 +153,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script>
-        document.getElementById('includecredit').addEventListener('click', function() {
-            this.classList.toggle('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            const includeCreditToggle = document.getElementById('includecredit');
+            includeCreditToggle.addEventListener('click', function() {
+                this.classList.toggle('inactive');
+            });
         });
     </script>
 </body>
