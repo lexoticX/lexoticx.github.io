@@ -30,20 +30,28 @@
             padding: 10px;
             border-radius: 50px;
         }
-        button {
-            padding: 10px 20px;
+        #return {
+            position: absolute;
+            top: 10px;
+            left: 10px;
             font-size: 14px;
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        #return .arrow {
+            margin-right: 5px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
             background-color: #555;
             border-radius: 50px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
             cursor: pointer;
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        button.active {
-            background-color: #007bff;
         }
         button:hover {
             background-color: #777;
@@ -95,7 +103,9 @@
     </style>
 </head>
 <body>
-    <button onclick="location.href='/datapack-updater'" class="active">Datapack Updater</button>
+    <button id="return" onclick="location.href='/'">
+        <span class="arrow">&#8592;</span> Return to Main Site
+    </button>
     <h1>Datapack Updater</h1>
     <div class="file-upload">
         <div id="fileName"></div>
