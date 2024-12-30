@@ -96,34 +96,44 @@
             flex-direction: column;
             align-items: center;
         }
-        .toggle {
-            --width: 40px;
-            --height: 20px;
-            --border-radius: 10px;
+        .switch {
             position: relative;
-            width: var(--width);
-            height: var(--height);
-            background: #555;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: background 0.3s;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
         }
-        .toggle::before {
-            content: "";
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
             position: absolute;
+            cursor: pointer;
             top: 0;
             left: 0;
-            width: var(--height);
-            height: var(--height);
-            background: #fff;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider::before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
             border-radius: 50%;
-            transition: transform 0.3s;
         }
-        .toggle.active {
-            background: #007bff;
+        input:checked + .slider {
+            background-color: #007bff;
         }
-        .toggle.active::before {
-            transform: translateX(var(--width) - var(--height));
+        input:checked + .slider::before {
+            transform: translateX(26px);
         }
     </style>
 </head>
@@ -144,24 +154,15 @@
     </div>
     <div class="credit-container">
         <label for="includecredit">Include Credit</label>
-        <div id="includecredit" class="toggle"></div>
-        <input type="checkbox" id="includecreditinput" style="display: none;" checked>
+        <label class="switch">
+            <input type="checkbox" id="includecreditinput" checked>
+            <span class="slider"></span>
+        </label>
     </div>
     <button id="update">Update</button>
     <div class="loading-spinner" id="loadingSpinner"></div>
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const includeCreditToggle = document.getElementById('includecredit');
-            const includeCreditInput = document.getElementById('includecreditinput');
-            includeCreditToggle.classList.add('active');
-            includeCreditToggle.addEventListener('click', function() {
-                includeCreditToggle.classList.toggle('active');
-                includeCreditInput.checked = includeCreditToggle.classList.contains('active');
-            });
-        });
-    </script>
 </body>
 </html>
