@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const fileNameDisplay = document.getElementById('fileName');
     const goBackButton = document.getElementById('goBack'); // Assuming there's a button with id 'goBack'
-
+    
     // Disable all buttons except "Go back to main site"
     document.querySelectorAll('button').forEach(button => {
         if (button !== goBackButton) {
@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('zipFile');
     fileInput.setAttribute('accept', '.txt');
 
+    let uploadedFileContent = '';
+
     // Handle file upload
     fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -48,10 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const content = e.target.result;
-                const updatedContent = content.replace(/\/say/g, '/tell');
-                console.log('Updated Content:', updatedContent);
-                // Here you can handle updatedContent, e.g., display it or send it to the server
+                uploadedFileContent = e.target.result;
             };
             reader.readAsText(file);
         } else {
@@ -59,8 +58,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Disable update button for now
+    // Enable update button functionality
     document.getElementById('update').addEventListener('click', function() {
-        alert('Update functionality is disabled temporarily.');
+        if (!uploadedFileContent) {
+            alert('Please upload a txt file first.');
+            return;
+        }
+        
+        const updatedContent = uploadedFileContent.replace(/\/say/g, '/tell');
+        const blob = new Blob([updatedContent], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileNameDisplay.textContent;
+        link.click();
     });
 });
