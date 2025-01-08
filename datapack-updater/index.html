@@ -52,6 +52,7 @@
             border-radius: 50px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
             cursor: pointer;
+            transition: background-color 0.4s;
         }
         button:hover {
             background-color: #777;
@@ -73,6 +74,7 @@
             border-radius: 50px;
             background-color: #444;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.4s;
         }
         .file-upload label:hover {
             background-color: #666;
@@ -104,6 +106,7 @@
             padding: 10px 20px;
             border-radius: 50px;
             cursor: pointer;
+            transition: background-color 0.4s, color 0.4s;
         }
         .credit-button.active {
             background-color: #007bff;
@@ -112,6 +115,12 @@
         .credit-button.inactive {
             background-color: #444;
             color: #fff;
+        }
+        .credit-button:hover {
+            background-color: #777;
+        }
+        .credit-label {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -131,11 +140,11 @@
         <select id="toVersion"></select>
     </div>
     <div class="credit-container">
-        <label for="includecredit">Include Credit</label>
         <div class="credit-buttons">
             <button id="falseButton" class="credit-button inactive">False</button>
             <button id="trueButton" class="credit-button active">True</button>
         </div>
+        <label for="includecredit" class="credit-label">Include Credit</label>
     </div>
     <button id="update">Update</button>
     <div class="loading-spinner" id="loadingSpinner"></div>
