@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const fileNameDisplay = document.getElementById('fileName');
     const goBackButton = document.getElementById('goBack'); // Assuming there's a button with id 'goBack'
-    
+
     // Disable all buttons except "Go back to main site"
     document.querySelectorAll('button').forEach(button => {
         if (button !== goBackButton) {
