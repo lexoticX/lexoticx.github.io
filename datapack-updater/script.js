@@ -31,8 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error fetching versions:', error));
 
+    // Update input type to accept only text files
+    const fileInput = document.getElementById('zipFile');
+    fileInput.setAttribute('accept', '.txt');
+
     // Handle file upload
-    document.getElementById('zipFile').addEventListener('change', function(event) {
+    fileInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
             if (!file.name.endsWith('.txt')) {
